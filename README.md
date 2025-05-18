@@ -1,6 +1,6 @@
 # TradingView MCP Server
 
-A Market Control Platform (MCP) server that interacts with the TradingView platform to analyze stocks, execute mock trades, and perform market research.
+A Market Control Platform (MCP) server that interacts with the TradingView platform to analyze stocks, execute mock trades, and perform market research. The server implements the Model Context Protocol to serve as a context provider for large language models (LLMs).
 
 ## Features
 
@@ -26,6 +26,13 @@ A Market Control Platform (MCP) server that interacts with the TradingView platf
 - Analyze portfolio diversification
 - Get news related to portfolio holdings
 
+### 4. Model Context Protocol Integration
+
+- Implements Model Context Protocol (MCP) standard
+- Serves as a context provider for LLMs
+- Exposes stock analysis, trading, and research capabilities
+- Structured data responses for AI consumption
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -50,7 +57,7 @@ A Market Control Platform (MCP) server that interacts with the TradingView platf
    ```
    cp config.env .env
    ```
-   Edit the `.env` file to add your API keys.
+   Edit the `.env` file to add your API keys and adjust MCP settings.
 
 4. Start the server:
    ```
@@ -60,6 +67,89 @@ A Market Control Platform (MCP) server that interacts with the TradingView platf
 For development with auto-reload:
    ```
    npm run dev
+   ```
+
+## Model Context Protocol (MCP) Integration
+
+This server implements the Model Context Protocol, allowing it to serve as a context provider for large language models (LLMs).
+
+### MCP Endpoints
+
+- `GET /mcp-info` - Get basic information about the MCP provider
+- `GET /api/mcp/capabilities` - Get detailed capabilities of the MCP provider
+- `POST /api/mcp/context` - Request context data for LLM consumption
+
+### Using as an MCP Provider
+
+To use this server as an MCP provider for your LLM:
+
+1. Ensure the MCP integration is enabled in your environment:
+   ```
+   MCP_ENABLED=true
+   MCP_PROVIDER_NAME=tradingview-mcp
+   MCP_VERSION=1.0
+   ```
+
+2. Configure your LLM client to connect to this server by using the MCP endpoints.
+
+3. Send requests to the `/api/mcp/context` endpoint in the following format:
+   ```json
+   {
+     "type": "stock_analysis",
+     "parameters": {
+       "symbol": "AAPL",
+       "timeframe": "1d"
+     }
+   }
+   ```
+
+### Available MCP Request Types
+
+1. **Stock Analysis:**
+   ```json
+   {
+     "type": "stock_analysis",
+     "parameters": {
+       "symbol": "AAPL",
+       "timeframe": "1w"
+     }
+   }
+   ```
+
+2. **Portfolio Management:**
+   ```json
+   {
+     "type": "portfolio",
+     "parameters": {
+       "action": "performance",
+       "period": "1m"
+     }
+   }
+   ```
+
+3. **Trade Execution:**
+   ```json
+   {
+     "type": "trade_execution",
+     "parameters": {
+       "symbol": "MSFT",
+       "action": "buy",
+       "quantity": 10,
+       "type": "market"
+     }
+   }
+   ```
+
+4. **Market Research:**
+   ```json
+   {
+     "type": "market_research",
+     "parameters": {
+       "type": "news",
+       "symbols": ["AAPL", "MSFT"],
+       "limit": 5
+     }
+   }
    ```
 
 ## API Documentation

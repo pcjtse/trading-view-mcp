@@ -33,15 +33,28 @@ const logger = winston.createLogger({
 const stockAnalysisRoutes = require('./routes/stockAnalysis');
 const tradingRoutes = require('./routes/trading');
 const marketResearchRoutes = require('./routes/marketResearch');
+const mcpRoutes = require('./routes/mcp');
 
 // Mount routes
 app.use('/api/analysis', stockAnalysisRoutes);
 app.use('/api/trading', tradingRoutes);
 app.use('/api/research', marketResearchRoutes);
+app.use('/api/mcp', mcpRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'MCP server is running' });
+});
+
+// MCP Info endpoint
+app.get('/mcp-info', (req, res) => {
+  res.status(200).json({
+    provider: process.env.MCP_PROVIDER_NAME || 'tradingview-mcp',
+    version: process.env.MCP_VERSION || '1.0',
+    status: 'active',
+    capabilities_endpoint: '/api/mcp/capabilities',
+    context_endpoint: '/api/mcp/context'
+  });
 });
 
 // Error handling middleware
@@ -59,6 +72,12 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
   console.log(`Server running on port ${PORT}`);
+  
+  // Log MCP status
+  if (process.env.MCP_ENABLED === 'true') {
+    logger.info('Model Context Protocol (MCP) integration is enabled');
+    console.log('Model Context Protocol (MCP) integration is enabled');
+  }
 });
 
 module.exports = app; 
